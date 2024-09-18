@@ -15,7 +15,7 @@ async function getAuthClient() {
   // from the Google Cloud Console
   const auth = new JWT({
     keyFile:
-      "../creds.json",
+      "creds.json",
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
   });
   await auth.authorize();
@@ -91,6 +91,7 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
 async function loadData(url: string, sheet: string, browser: Browser) {
     let pageNumber = 1;
     let googleSheetRecords: GoogleSheetRecord[] = [];
+    await updateGoogleSheet(sheet, []);
     do {
       console.log("load page " + pageNumber);
       if (pageNumber > 1) {
