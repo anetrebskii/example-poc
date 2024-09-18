@@ -99,6 +99,7 @@ async function loadData(url: string, sheet: string, browser: Browser) {
       }
       const searchResult = await scrapeSearchResults(url, browser);
 
+      googleSheetRecords = [];
       googleSheetRecords = searchResult.map((x) => ({
         ...x,
         lastFoundIn: new Date().toISOString(),
