@@ -1,7 +1,6 @@
 name: Run ts-node
 
 on: 
-  push: {}
   schedule:
     - cron: '0 0,12 * * *'  # Runs at midnight and noon
   workflow_dispatch: {}  # Allows manual triggering
