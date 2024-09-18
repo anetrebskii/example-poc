@@ -1,0 +1,25 @@
+name: Run Check For New
+
+on: 
+  schedule:
+    - cron: '0 * * * *'  # Runs every hour
+  workflow_dispatch: {}  # Allows manual triggering
+
+jobs:
+  check-for-new:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set environment variables
+        run: |
+          echo "TG_SECRET=${{ secrets.TG_SECRET }}" >> $GITHUB_ENV
+          echo "TG_CHANEL=${{ secrets.TG_CHANEL }}" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Run checkForNew script
+        run: |
+          npx ts-node src/checkForNew.ts
