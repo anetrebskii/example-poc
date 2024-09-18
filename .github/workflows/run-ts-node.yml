@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Download secret value
-        run: echo "${{ secrets.CRED_JSON }}" > creds.json
+        run: echo '${{ secrets.CRED_JSON }}' > creds.json
 
       - name: Install dependencies
         run: |
