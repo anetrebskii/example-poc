@@ -14,8 +14,7 @@ async function getAuthClient() {
   // You'll need to set up credentials and download a JSON key file
   // from the Google Cloud Console
   const auth = new JWT({
-    keyFile:
-      "creds.json",
+    keyFile: "creds.json",
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
   });
   await auth.authorize();
@@ -27,7 +26,7 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
   const sheets = google.sheets({ version: "v4", auth });
 
   const spreadsheetId = "1516pEtVknzNlMRmMq5NlOa3hUTgL2xPLl_aY_QylnwE";
-  const range = sheet+"!A:F"; // Adjust based on your sheet structure
+  const range = sheet + "!A:F"; // Adjust based on your sheet structure
 
   // Get existing records
   const response = await sheets.spreadsheets.values.get({
@@ -89,53 +88,52 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
 }
 
 async function loadData(baseUrl: string, sheet: string, browser: Browser) {
-    let pageNumber = 1;
-    let googleSheetRecords: GoogleSheetRecord[] = [];
-    await updateGoogleSheet(sheet, []);
-    do {
-      
-      let url = baseUrl;
-      if (pageNumber > 1) {
-        url +=  "?p=" + pageNumber;  
-      }
+  let pageNumber = 1;
+  let googleSheetRecords: GoogleSheetRecord[] = [];
+  await updateGoogleSheet(sheet, []);
+  do {
+    console.log("load page: " + pageNumber);
+    let url = baseUrl;
+    if (pageNumber > 1) {
+      url += "?p=" + pageNumber;
+    }
 
-      console.log("load page: " + pageNumber + ", with url: " + url);
-      
-      const searchResult = await scrapeSearchResults(url, browser);
+    const searchResult = await scrapeSearchResults(url, browser);
 
-      googleSheetRecords = [];
-      googleSheetRecords = searchResult.map((x) => ({
-        ...x,
-        lastFoundIn: new Date().toISOString(),
-      }));
+    googleSheetRecords = [];
+    googleSheetRecords = searchResult.map((x) => ({
+      ...x,
+      lastFoundIn: new Date().toISOString(),
+    }));
 
-      await updateGoogleSheet(sheet, googleSheetRecords);
-      console.log("Google Sheet " + sheet + " updated successfully");
-      pageNumber = pageNumber + 1;
+    await updateGoogleSheet(sheet, googleSheetRecords);
+    console.log("Google Sheet " + sheet + " updated successfully");
+    pageNumber = pageNumber + 1;
 
-      // Add a 20-second wait
-      console.log("Waiting for 20 seconds before the next request...");
-      await new Promise((resolve) => setTimeout(resolve, 20000));
-    } while (googleSheetRecords.length > 0);
+    // Add a 20-second wait
+    console.log("Waiting for 20 seconds before the next request...");
+    await new Promise((resolve) => setTimeout(resolve, 20000));
+  } while (googleSheetRecords.length > 0);
 }
 
 (async function () {
   try {
-    const browser = await puppeteer.launch({ headless: "new", timeout: 120000 });
+    const browser = await puppeteer.launch({
+      headless: "new",
+      timeout: 120000,
+    });
 
     await loadData(
-        "https://www.avito.ru/samara/garazhi_i_mashinomesta/sdam",
-        "Rent",
-        browser
-    )
-        
-    await loadData(
-        "https://www.avito.ru/samara/garazhi_i_mashinomesta/prodam",
-        "Sell",
-        browser
+      "https://www.avito.ru/samara/garazhi_i_mashinomesta/sdam",
+      "Rent",
+      browser
     );
 
-
+    await loadData(
+      "https://www.avito.ru/samara/garazhi_i_mashinomesta/prodam",
+      "Sell",
+      browser
+    );
   } catch (error) {
     console.error("An error occurred:", error);
   }
