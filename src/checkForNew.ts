@@ -11,8 +11,7 @@ import axios from "axios";
 
       const searchResult = await scrapeSearchResults("https://www.avito.ru/samara/garazhi_i_mashinomesta/prodam", browser);
       const goodAds = searchResult.filter(x =>
-         x.address.toLowerCase() == 'Никитинская ул., 53А'.toLowerCase() && x.price < 750000
-        || x.address.toLowerCase() == 'ул. Гастелло, 43А'.toLowerCase() && x.price > 1000000);
+         x.address.toLowerCase() == 'Никитинская ул., 53А'.toLowerCase() && x.price < 750000);
 
       // Send good ads to Telegram channel
       for (const ad of goodAds) {
