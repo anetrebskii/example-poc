@@ -1,0 +1,22 @@
+name: Run ts-node
+
+on: 
+  push: {}
+  schedule:
+    - cron: '0 0,12 * * *'  # Runs at midnight and noon
+  workflow_dispatch: {}  # Allows manual triggering
+
+jobs:
+  run-ts-node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download secret value
+        run: echo "${{ secrets.CRED_JSON }}" > avito-436017-d862b8f02a83.json
+
+      - name: Install dependencies
+        run: |
+          npm install
+          
+      - run: npm start
