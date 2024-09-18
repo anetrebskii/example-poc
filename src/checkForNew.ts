@@ -3,8 +3,9 @@ import { scrapeSearchResults } from "./lib";
 import axios from "axios";
 
 (async function () {
+    let browser; // Declare browser variable
     try {
-      const browser = await puppeteer.launch({
+      browser = await puppeteer.launch({
         headless: "new",
         timeout: 240000,
       });
@@ -24,5 +25,9 @@ import axios from "axios";
 
     } catch (error) {
       console.error("An error occurred:", error);
+    } finally {
+      if (browser) {
+          await browser.close(); // Ensure the browser closes
+      }
     }
 })();

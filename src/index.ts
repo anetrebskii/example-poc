@@ -117,8 +117,9 @@ async function loadData(baseUrl: string, sheet: string, browser: Browser) {
 }
 
 (async function () {
+  let browser; // Declare browser variable
   try {
-    const browser = await puppeteer.launch({
+    browser = await puppeteer.launch({
       headless: "new",
       timeout: 240000,
     });
@@ -136,5 +137,9 @@ async function loadData(baseUrl: string, sheet: string, browser: Browser) {
     );
   } catch (error) {
     console.error("An error occurred:", error);
+  } finally {
+    if (browser) {
+      await browser.close(); // Ensure the browser closes
+    }
   }
 })();
