@@ -15,7 +15,7 @@ async function getAuthClient() {
   // from the Google Cloud Console
   const auth = new JWT({
     keyFile:
-      "/Users/alex/Projects/mine/avito_scrapper/avito-436017-d862b8f02a83.json",
+      "../creds.json",
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
   });
   await auth.authorize();
