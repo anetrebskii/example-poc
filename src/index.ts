@@ -88,15 +88,19 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
   }
 }
 
-async function loadData(url: string, sheet: string, browser: Browser) {
+async function loadData(baseUrl: string, sheet: string, browser: Browser) {
     let pageNumber = 1;
     let googleSheetRecords: GoogleSheetRecord[] = [];
     await updateGoogleSheet(sheet, []);
     do {
-      console.log("load page " + pageNumber);
+      
+      let url = baseUrl;
       if (pageNumber > 1) {
-        url += "?p=" + pageNumber;
+        url +=  "?p=" + pageNumber;  
       }
+
+      console.log("load page: " + pageNumber + ", with url: " + url);
+      
       const searchResult = await scrapeSearchResults(url, browser);
 
       googleSheetRecords = [];
