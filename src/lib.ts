@@ -21,7 +21,7 @@ export async function scrapeSearchResults(
   const page = await browser.newPage();
   try {
     
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000  }); // Увеличено время ожидания
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 240000  }); // Увеличено время ожидания
     // await page.waitForSelector('div[data-marker="item"]');
     const shortListing: AvitoListItem[] = await page.evaluate(() => {
       const items = Array.from(

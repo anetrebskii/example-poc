@@ -120,7 +120,7 @@ async function loadData(baseUrl: string, sheet: string, browser: Browser) {
   try {
     const browser = await puppeteer.launch({
       headless: "new",
-      timeout: 120000,
+      timeout: 240000,
     });
 
     await loadData(
