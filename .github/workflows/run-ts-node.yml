@@ -8,6 +8,7 @@ on:
 jobs:
   run-ts-node:
     runs-on: ubuntu-latest
+    timeout-minutes: 60  # Set timeout to 1 hour
     steps:
       - uses: actions/checkout@v4
 
