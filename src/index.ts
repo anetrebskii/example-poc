@@ -99,6 +99,7 @@ async function loadData(baseUrl: string, sheet: string, browser: Browser) {
     }
 
     const searchResult = await scrapeSearchResults(url, browser);
+    console.log("Found: " + searchResult.map(x => x.url.split("_")[x.url.split("_").length - 1]).join(', '));
 
     googleSheetRecords = [];
     googleSheetRecords = searchResult.map((x) => ({
