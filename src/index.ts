@@ -123,6 +123,7 @@ async function loadData(baseUrl: string, sheet: string, browser: Browser) {
     browser = await puppeteer.launch({
       headless: "new",
       timeout: 240000,
+      args: ['--no-sandbox']
     });
 
     await loadData(
