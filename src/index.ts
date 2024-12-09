@@ -21,6 +21,18 @@ async function getAuthClient() {
   return auth;
 }
 
+async function getSheetRecords(sheet: string) {
+  const auth = await getAuthClient();
+  const sheets = google.sheets({ version: "v4", auth });
+  const spreadsheetId = "1516pEtVknzNlMRmMq5NlOa3hUTgL2xPLl_aY_QylnwE";
+  const range = sheet + "!A:H"; // Adjust based on your sheet structure
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range,
+  });
+  return response.data.values || [];
+}
+
 async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
   const auth = await getAuthClient();
   const sheets = google.sheets({ version: "v4", auth });
@@ -35,11 +47,12 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
   });
 
   const existingRecords = response.data.values || [];
+  
   const updatedRecords = [];
 
   for (const record of records) {
     const existingIndex = existingRecords.findIndex(
-      (row) => row[4] === record.url
+      (row) => row[4].split('?')[0] === record.url.split('?')[0]
     );
     if (existingIndex !== -1) {
       // Update existing record
@@ -48,7 +61,7 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
         record.description,
         record.price.toString(),
         record.address,
-        record.url,
+        record.url.split('?')[0],
         record.lastFoundIn,
         existingRecords[existingIndex][6],
       ];
@@ -59,7 +72,7 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
         record.description,
         record.price.toString(),
         record.address,
-        record.url,
+        record.url.split('?')[0],
         record.lastFoundIn,
         new Date(),
       ]);
