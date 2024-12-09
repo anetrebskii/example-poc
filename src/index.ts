@@ -38,7 +38,7 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
   const sheets = google.sheets({ version: "v4", auth });
 
   const spreadsheetId = "1516pEtVknzNlMRmMq5NlOa3hUTgL2xPLl_aY_QylnwE";
-  const range = sheet + "!A:F"; // Adjust based on your sheet structure
+  const range = sheet + "!A:H"; // Adjust based on your sheet structure
 
   // Get existing records
   const response = await sheets.spreadsheets.values.get({
@@ -64,6 +64,7 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
         record.url.split('?')[0],
         record.lastFoundIn,
         existingRecords[existingIndex][6],
+        Math.floor((new Date(record.lastFoundIn).getTime() - new Date(existingRecords[existingIndex][6]).getTime())/1000/60/60/24)        
       ];
     } else {
       // Add new record
@@ -75,6 +76,7 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
         record.url.split('?')[0],
         record.lastFoundIn,
         new Date(),
+        0
       ]);
     }
   }
