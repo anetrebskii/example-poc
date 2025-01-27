@@ -52,8 +52,23 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
 
   for (const record of records) {
     const existingIndex = existingRecords.findIndex(
+      (row) => row[4].split('?')[0] === record.url.split('?')[0] && 
+               row[2] === record.price.toString()
+    );
+
+    // Find all records with the same ID
+    const sameIdRecords = existingRecords.filter(
       (row) => row[4].split('?')[0] === record.url.split('?')[0]
     );
+
+    // For new records, always use empty string
+    // For existing records, check for newer entries
+    const isSoldStatus = existingIndex === -1 ? "" : (
+      sameIdRecords.some(row => 
+        new Date(row[6]) > new Date(existingRecords[existingIndex][6])
+      ) ? "No" : ""
+    );
+
     if (existingIndex !== -1) {
       // Update existing record
       existingRecords[existingIndex] = [
@@ -64,7 +79,8 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
         record.url.split('?')[0],
         record.lastFoundIn,
         existingRecords[existingIndex][6],
-        Math.floor((new Date(record.lastFoundIn).getTime() - new Date(existingRecords[existingIndex][6]).getTime())/1000/60/60/24)        
+        Math.floor((new Date(record.lastFoundIn).getTime() - new Date(existingRecords[existingIndex][6]).getTime())/1000/60/60/24),
+        isSoldStatus
       ];
     } else {
       // Add new record
@@ -75,8 +91,9 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
         record.address,
         record.url.split('?')[0],
         record.lastFoundIn,
-        new Date(),
-        0
+        new Date().toISOString(),
+        0,
+        isSoldStatus
       ]);
     }
   }
