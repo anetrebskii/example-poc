@@ -38,7 +38,7 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
   const sheets = google.sheets({ version: "v4", auth });
 
   const spreadsheetId = "1516pEtVknzNlMRmMq5NlOa3hUTgL2xPLl_aY_QylnwE";
-  const range = sheet + "!A:H"; // Adjust based on your sheet structure
+  const range = sheet + "!A:I"; // Adjust based on your sheet structure
 
   // Get existing records
   const response = await sheets.spreadsheets.values.get({
@@ -47,27 +47,34 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
   });
 
   const existingRecords = response.data.values || [];
-  
+
   const updatedRecords = [];
 
   for (const record of records) {
     const existingIndex = existingRecords.findIndex(
-      (row) => row[4].split('?')[0] === record.url.split('?')[0] && 
-               row[2] === record.price.toString()
+      (row) =>
+        row[4].split("?")[0] === record.url.split("?")[0] &&
+        row[2] === record.price.toString()
     );
 
     // Find all records with the same ID
     const sameIdRecords = existingRecords.filter(
-      (row) => row[4].split('?')[0] === record.url.split('?')[0]
+      (row) => row[4].split("?")[0] === record.url.split("?")[0]
     );
 
-    // For new records, always use empty string
-    // For existing records, check for newer entries
-    const isSoldStatus = existingIndex === -1 ? "" : (
-      sameIdRecords.some(row => 
-        new Date(row[6]) > new Date(existingRecords[existingIndex][6])
-      ) ? "No" : ""
-    );
+    if (sameIdRecords.length > 1) {
+      sameIdRecords
+        .filter(
+          (row) =>
+            new Date(row[6]) <
+            (existingIndex === -1
+              ? new Date()
+              : new Date(existingRecords[existingIndex][6]))
+        )
+        .forEach((row) => {
+          row[8] = "No";
+        });
+    }
 
     if (existingIndex !== -1) {
       // Update existing record
@@ -76,11 +83,17 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
         record.description,
         record.price.toString(),
         record.address,
-        record.url.split('?')[0],
+        record.url.split("?")[0],
         record.lastFoundIn,
         existingRecords[existingIndex][6],
-        Math.floor((new Date(record.lastFoundIn).getTime() - new Date(existingRecords[existingIndex][6]).getTime())/1000/60/60/24),
-        isSoldStatus
+        Math.floor(
+          (new Date(record.lastFoundIn).getTime() -
+            new Date(existingRecords[existingIndex][6]).getTime()) /
+            1000 /
+            60 /
+            60 /
+            24
+        ),
       ];
     } else {
       // Add new record
@@ -89,11 +102,10 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
         record.description,
         record.price.toString(),
         record.address,
-        record.url.split('?')[0],
+        record.url.split("?")[0],
         record.lastFoundIn,
         new Date().toISOString(),
         0,
-        isSoldStatus
       ]);
     }
   }
@@ -131,7 +143,12 @@ async function loadData(baseUrl: string, sheet: string, browser: Browser) {
     }
 
     const searchResult = await scrapeSearchResults(url, browser);
-    console.log("Found: " + searchResult.map(x => x.url.split("_")[x.url.split("_").length - 1]).join(', '));
+    console.log(
+      "Found: " +
+        searchResult
+          .map((x) => x.url.split("_")[x.url.split("_").length - 1])
+          .join(", ")
+    );
 
     googleSheetRecords = [];
     googleSheetRecords = searchResult.map((x) => ({
@@ -155,7 +172,7 @@ async function loadData(baseUrl: string, sheet: string, browser: Browser) {
     browser = await puppeteer.launch({
       headless: "new",
       timeout: 240000,
-      args: ['--no-sandbox']
+      args: ["--no-sandbox"],
     });
 
     await loadData(
