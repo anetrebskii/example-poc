@@ -57,24 +57,38 @@ async function updateGoogleSheet(sheet: string, records: GoogleSheetRecord[]) {
         row[2] === record.price.toString()
     );
 
-    // Find all records with the same ID
-    const sameIdRecords = existingRecords.filter(
-      (row) => row[4].split("?")[0] === record.url.split("?")[0]
-    );
+    const firstFoundAt =
+      existingIndex === -1
+        ? new Date()
+        : new Date(existingRecords[existingIndex][6]);
 
-    if (sameIdRecords.length > 1) {
-      sameIdRecords
-        .filter(
-          (row) =>
-            new Date(row[6]) <
-            (existingIndex === -1
-              ? new Date()
-              : new Date(existingRecords[existingIndex][6]))
-        )
-        .forEach((row) => {
-          row[8] = "No";
-        });
-    }
+    existingRecords.forEach((row, index) => {
+      if (
+        row[4].split("?")[0] === record.url.split("?")[0] &&
+        new Date(row[6]) < firstFoundAt
+      ) {
+        existingRecords[index][8] = "No";
+      }
+    });
+
+    // // Find all records with the same ID
+    // const sameIdRecords = existingRecords.filter(
+    //   (row) => row[4].split("?")[0] === record.url.split("?")[0]
+    // );
+
+    // if (sameIdRecords.length > 1) {
+    //   sameIdRecords
+    //     .filter(
+    //       (row) =>
+    //         new Date(row[6]) <
+    //         (existingIndex === -1
+    //           ? new Date()
+    //           : new Date(existingRecords[existingIndex][6]))
+    //     )
+    //     .forEach((row) => {
+    //       row[8] = "No";
+    //     });
+    // }
 
     if (existingIndex !== -1) {
       // Update existing record
